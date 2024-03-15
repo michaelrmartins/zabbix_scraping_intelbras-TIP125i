@@ -1,5 +1,7 @@
 _Intelbras TIP 125i Scraping_
 
+![Intelbras TIP 125i](https://backend.intelbras.com/sites/default/files/integration/tip_125i_persp_dir.png)
+
 ## Project Description
 
 The project consists of a Python script that performs web scraping of the web page of an Intelbras IP phone model TIP 125i. The main objective is to extract relevant information from the web page for later use in a Zabbix template.

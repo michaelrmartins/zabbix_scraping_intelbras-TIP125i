@@ -1,0 +1,10 @@
+# Get the page source
+# page_source = driver.page_source
+
+# Print the page source  ---------- DEBUG -------------- 
+#print("Conteúdo da página:")
+# print(page_source)
+
+# Get the value of the wan_mac_address element using JavaScript
+#wan_mac_address_value = driver.execute_script("return document.getElementById('wan_mac_address').textContent")
+#print("Valor do endereço MAC da WAN:", wan_mac_address_value)
