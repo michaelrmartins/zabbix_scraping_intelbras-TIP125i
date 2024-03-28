@@ -1,12 +1,39 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import module_pinger
 import time
+import json
+import sys
+import subprocess
 
+# Host Target Ip Address
+try:
+    host_target = sys.argv[1]
+except IndexError:
+    print("IP is not Defined")
+    sys.exit()
+except NameError:
+    print("IP is not Defined")
+    sys.exit()
+else:
+    print("ok")
 
+# Check Host Status
+host_target_status = module_pinger.ping(host_target)
+if host_target_status == 'down':
+    exit("Offline")
+print("Host online:", host_target)
+
+# Split IP Address and return last number
+def splitIp(ipaddress):
+    lastnumber = int(ipaddress.split('.')[-1])
+    return(lastnumber)
+    
 # Configure ChromeOptions
 chrome_options = Options() # Initialize object
 chrome_options.add_argument('--headless')  # Run Headless Mode
@@ -21,16 +48,17 @@ service = Service()
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # Website URL
-url_status = 'https://admin:admin@192.168.5.75/_index.html#/status'
-url_account = 'https://admin:admin@192.168.5.75/_index.html#/account/1'
+url_status = f'https://admin:admin@{host_target}/_index.html#/status'
+url_account = f'https://admin:admin@{host_target}/_index.html#/account/1'
 print("Acessando a URL:", url_status)
 
 # Get website Data
 driver.get(url_status)
 
+# Loading ( Debug )
 print("Aguardando a página carregar...")
 
-# Wating body element
+# Waiting body element
 wait = WebDriverWait(driver, 100)
 wait.until(EC.visibility_of_element_located((By.ID, "label_operation_time")))
 time.sleep(5)  # Wait Full Page Load
@@ -57,9 +85,9 @@ out_wan_ip_address = driver.find_elements(By.ID, 'wan_ip_address')[0].text
 out_wan_mac_address = driver.find_elements(By.ID, 'wan_mac_address')[0].text
 out_wan_host_name = driver.find_elements(By.ID, 'wan_hostname')[0].text
 
-
 # WAN element find and Click to change page --------- PAGE "CONTA" / "BASICO"
 print("Loading ", url_account)
+
 # Get website Data
 driver.get(url_account)
 time.sleep(5)  # Wait
@@ -95,7 +123,14 @@ out_account_sip_server_secondary_ip_value = out_account_sip_server_secondary_ip.
 out_account_sip_server_secondary_port = driver.find_element(By.ID, 'sip_server_port2')
 out_account_sip_server_secondary_port_value = out_account_sip_server_secondary_port.get_attribute('value')
 
-# Print website data
+out_account_sip_server_transport_protocol = driver.find_element(By.ID, 'transport')
+dropdown_transport = Select(out_account_sip_server_transport_protocol)
+dropdown_transport_first_option = dropdown_transport.first_selected_option
+# out_account_sip_server_transport_protocol_value = out_account_sip_server_transport_protocol.get_attribute('value')
+out_account_sip_server_transport_protocol_value = dropdown_transport_first_option.get_attribute('value')
+
+'''
+# Print website data ( Debug )
 print ("Uptime:", out_system_uptime)
 print ("Version:", out_system_version)
 print ("Revision:", out_system_revision)
@@ -112,4 +147,49 @@ print ("SIP Proxy Server IP:", out_account_sip_proxy_server_ip_value)
 print ("SIP Proxy Server Port:", out_account_sip_proxy_server_port_value)
 print ("SIP Server Secondary IP:", out_account_sip_server_secondary_ip_value)
 print ("SIP Server Secondary Port:", out_account_sip_server_secondary_port_value)
+print ("SIP Server Transport Protocol:", out_account_sip_server_transport_protocol_value)
+'''
 
+data = {
+
+    "Uptime": out_system_uptime,
+    "Version": out_system_version,
+    "Revision": out_system_revision,
+    "IP": out_wan_ip_address,
+    "Mac": out_wan_mac_address,
+    "Hostname": out_wan_host_name,
+    "Account_Status": out_user_account_status,
+    "ID_Name": out_account_caller_id_name_value,
+    "Register_Name": out_account_caller_register_name_value,
+    "User_Name": out_account_caller_user_name_value,
+    "SIP_Server_IP": out_account_sip_server_ip_value,
+    "SIP_Server_Port": out_account_sip_server_port_value,
+    "SIP_Proxy_Server_IP": out_account_sip_proxy_server_ip_value,
+    "SIP_Proxy_Server_Port": out_account_sip_proxy_server_port_value,
+    "SIP_Server_Secondary_IP": out_account_sip_server_secondary_ip_value,
+    "SIP_Server_Secondary_Port": out_account_sip_server_secondary_port_value,
+    "SIP_Server_Transport_Protocol": out_account_sip_server_transport_protocol_value
+}
+
+# Converting to JSON
+json_data = json.dumps(data, indent=4)
+
+# Get host ip address and split IP, using last Ip number 
+# like Zabbix Host Identifier
+host_number_index_zabbix = splitIp(host_target)
+
+# Assembly Zabbix Sender Command
+zabbix_sender_command = [
+    "zabbix_sender",
+    "-z", "192.168.0.214",
+    "-p", "10051",
+    "-s", f"Telefone IP {host_number_index_zabbix}",
+    "-k", "system.tip125i.data.raw",
+    "-o", json_data
+]
+
+# Printing JSON ( DEBUG )
+# print(json_data)
+
+# Run Zabbix Sender command
+subprocess.run(zabbix_sender_command)
