@@ -84,7 +84,7 @@ if auth_token:
         # print("IDs dos hosts no grupo:", hosts_list) # Debug
         # print("Ips dos hosts no grupo:", ip_interface_list) # Debug
         for ip in ip_interface_list:
-            subprocess.run(['python3', 'scraping_intelbras_tip125i-Selenium.py', ip])
+            subprocess.run(['python3', '/home/gti/zabbix_scraping/scraping_intelbras_tip125i-Selenium.py', ip])
             print(ip)
     else:
         print("Falha ao obter IDs dos hosts no grupo.")
