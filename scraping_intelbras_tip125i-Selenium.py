@@ -41,6 +41,26 @@ chrome_options.add_argument('--no-sandbox')  # Important to run in No GUI Eviron
 chrome_options.add_argument('--disable-dev-shm-usage')  # Important to run in No GUI Evironment 
 chrome_options.add_argument('--ignore-certificate-errors')  # No check SSL Certified Error
 
+# Extra Options
+chrome_options.add_argument('--disable-background-networking')  # Desativa todas as atividades de rede em segundo plano
+chrome_options.add_argument('--disable-client-side-phishing-detection')  # Desativa a detecção de phishing
+chrome_options.add_argument('--disable-default-apps')  # Desativa aplicativos padrão que podem fazer chamadas de rede
+chrome_options.add_argument('--disable-extensions')  # Desativa todas as extensões
+chrome_options.add_argument('--disable-sync')  # Desativa a sincronização do Google
+chrome_options.add_argument('--disable-translate')  # Desativa o serviço de tradução
+chrome_options.add_argument('--metrics-recording-only')  # Limita a coleta de dados
+chrome_options.add_argument('--safebrowsing-disable-auto-update')  # Desativa a atualização automática do Safe Browsing
+chrome_options.add_argument('--disable-component-update')  # Desativa a atualização de componentes do Chrome
+chrome_options.add_argument('--no-first-run')  # Impede que o Chrome execute ações durante a primeira execução
+chrome_options.add_argument('--disable-features=TranslateUI,BlinkFeatures')  # Desativa algumas funcionalidades específicas
+
+# Chrome was accessing external google ips, downloading several data
+# This option create False proxy and redirect all connections to Black role, but ignores local network
+chrome_options.add_argument('--proxy-server=localhost:8080')
+chrome_options.add_argument('--proxy-bypass-list=192.168.0.0/21')  
+
+
+
 # Inicialize ChromeDriver Service
 service = Service()
 
