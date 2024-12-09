@@ -18,8 +18,8 @@ import re
 
 # Autenticação
 ZBX_URL = 'http://localhost/zabbix'
-ZBX_USERNAME = 'gti'
-ZBX_PASSWORD = '6feira*13'
+ZBX_USERNAME = ''
+ZBX_PASSWORD = ''
 
 # Conexão com a API
 try:
