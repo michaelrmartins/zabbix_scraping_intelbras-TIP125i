@@ -1,6 +1,5 @@
 # Michael Martins - 2024
 # Check Host is online/Offline using ping
-
 # Receive Target Ip Address as argument and return "down" or "up"
 
 # Libraries

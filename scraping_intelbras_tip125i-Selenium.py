@@ -59,8 +59,6 @@ chrome_options.add_argument('--disable-features=TranslateUI,BlinkFeatures')  # D
 chrome_options.add_argument('--proxy-server=localhost:8080')
 chrome_options.add_argument('--proxy-bypass-list=192.168.0.0/21')  
 
-
-
 # Inicialize ChromeDriver Service
 service = Service()
 
